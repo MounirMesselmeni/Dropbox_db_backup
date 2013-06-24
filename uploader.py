@@ -1,6 +1,7 @@
 __author__ = "Virendra Rajput"
 __email__ = "virendra.rajput567@gmail.com"
 
+import os
 import json
 import datetime
 
@@ -10,6 +11,34 @@ try:
 except ImportError:
 	print "Dropbox module not installed\nInstall it with:\n\tpip install dropbox"
 	exit()
+
+import smtplib
+
+def sendemail(from_addr, to_addr_list, cc_addr_list,
+              subject, message,
+              login, password,
+              smtpserver='smtp.gmail.com:587'):
+    header  = 'From: %s\n' % from_addr
+    header += 'To: %s\n' % ','.join(to_addr_list)
+    header += 'Cc: %s\n' % ','.join(cc_addr_list)
+    header += 'Subject: %s\n\n' % subject
+    message = header + message
+
+    server = smtplib.SMTP(smtpserver)
+    server.starttls()
+    server.login(login,password)
+    problems = server.sendmail(from_addr, to_addr_list, message)
+    server.quit()
+
+def message_admins(msg):
+    sendemail(from_addr    = '',
+          to_addr_list = [''],
+          cc_addr_list = [''],
+          subject      = 'DB Backup',
+          message      = msg,
+          login        = '',
+          password     = '')
+
 
 def main():
 	client_secrets = json.loads(open("client_secrets.json").read())
@@ -53,12 +82,15 @@ def main():
 	client = dropbox_client.DropboxClient(sess)
 
 	try:
-		with open(datetime.datetime.today().strftime("%Y%m%d") + ".tar"): pass #check existance of while
+		with open(datetime.datetime.today().strftime("%Y%m%d") + ".tar.gz"): pass #check existance of while
 		print "Uploading started..."
-		print client.put_file("/db_backup/" + datetime.datetime.today().strftime("%Y%m%d") + ".tar", open(datetime.datetime.today().strftime("%Y%m%d") + ".tar"))
+		print client.put_file("/db_backup/" + datetime.datetime.today().strftime("%Y%m%d") + ".tar.gz", open(datetime.datetime.today().strftime("%Y%m%d") + ".tar.gz"))
+                os.remove(datetime.datetime.today().strftime("%Y%m%d") + ".tar.gz")
+                message_admins('DB Backup success %s @ %s'%("/db_backup/tvams_" + datetime.datetime.today().strftime("%Y%m%d") + ".tar", datetime.datetime.now()))
 		print "Uploading completed..."
 	except IOError:
 		#print client.account_info()
+                message_admins('DB Backup failed @ %s'%(datetime.datetime.now()))
 		print "DB backup file does not exists"
 	return
 
