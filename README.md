@@ -1,3 +1,15 @@
+Author
+------
+
+This project is a fork of https://github.com/bkvirendra/Dropbox_db_backup
+
+I have added this features:
+
+1. Compression support for postgresql dump command.
+2. Sending email to system admins when backup was uploaded to Dropbox or backup failure.
+3. Removing Database backup from the server when upload success
+
+
 Prerequistes
 ------------
 
