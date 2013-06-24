@@ -38,6 +38,11 @@ Follow these steps to setup the Dropbox app:
 
 And you are done with the Dropbox setup. 
 
+Dump file delete
+----------------
+
+If you want to keep the dump file you can comment line 88 in ```uploader.py```
+
 
 Cron Setup
 ----------
